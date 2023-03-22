@@ -1,6 +1,8 @@
 from django.shortcuts import render        
 from django.http import HttpResponse
-import json
+from django.http import HttpResponseNotFound
+from django.http import JsonResponse
+# import json
 
 def test(request):
     value = {
@@ -9,4 +11,7 @@ def test(request):
         "Itemid": 3,
         "price": 4
     }
-    return HttpResponse(json.dumps(value), content_type="application/json")
+    return JsonResponse( value )
+
+def NotFound( request ):
+    return JsonResponse( { "message": "NOT_FOUND" } )

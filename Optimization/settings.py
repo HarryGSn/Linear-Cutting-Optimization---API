@@ -33,6 +33,10 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # Our Defined Custom Migration Models
     'Optimization',
+    # 'Optimization.models',
+    'Optimization.routes',
+    'rest_framework',
+    # 'Optimization.controllers',
     # Django includes below
     'django.contrib.admin',
     'django.contrib.auth',
@@ -125,4 +129,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# AUTH_USER_MODEL = ''
+# AUTH_USER_MODEL = 'Optimization.UserProfile' #to check later
+
+# Set APPEND_SLASH to False to make trailing slashes optional
+APPEND_SLASH = False
