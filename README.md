@@ -1,20 +1,3 @@
-## Licenses
-
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![Apache License 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![GNU General Public License v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![BSD 3-Clause License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-
-
-
-# Linear Cutting Optimization
-
-A Course Project created for **Applied Programming using Python** by Dr.Karydis, at Ionian University, Department of Informatics.
-## Authors
-
-- [@HarryGSn / C.Giannaros](https://www.github.com/harrygsn)
-- [@DionyshsTetradhs / D.Tetradis](https://www.github.com/DionyshsTetradhs)
-
 
 ## API Reference
 
@@ -26,8 +9,8 @@ A Course Project created for **Applied Programming using Python** by Dr.Karydis,
 
 | Parameter | Type     | Required                | Description |
 | :-------- | :------- | :------------------------- | :--------- |
-| `username` | `string` | :heavy_check_mark | Users' registered user name |
-| `password` | `string` | :heavy_check_mark | Users' registered password |
+| `username` | `string` | &#9745; | Users' registered user name |
+| `password` | `string` | &#9745; | Users' registered password |
 
 
 ```http
@@ -36,7 +19,7 @@ A Course Project created for **Applied Programming using Python** by Dr.Karydis,
 
 | Parameter | Type     | Required                | Description |
 | :-------- | :------- | :------------------------- | :--------- |
-| `refresh` | `string` | :heavy_check_mark | JWT Refresh Token |
+| `refresh` | `string` | &#9745; | JWT Refresh Token |
 
 
 #### Create an Optimization
@@ -47,12 +30,12 @@ A Course Project created for **Applied Programming using Python** by Dr.Karydis,
 
 | Parameter | Type     | Required                | Description |
 | :-------- | :------- | :------------------------- | :--------- |
-| `settings.kerf` | `float` | :heavy_check_mark | Kerf (saw cut deduction) |
-| `settings.trim.left` | `float` | :x | left trim to be applied |
-| `settings.trim.right` | `float` | :x | right trim to be applied |
-| `settings.bar_length` | `float` | :heavy_check_mark | Bar Length to be used in optimization |
-| `parts[].length` | `float` | :heavy_check_mark | bar length to be cut |
-| `parts[].quantity` | `integer` | :heavy_check_mark | Times for this length to be used |
+| `settings.kerf` | `float` | &#9745; | Kerf (saw cut deduction) |
+| `settings.trim.left` | `float` | &#9744; | left trim to be applied |
+| `settings.trim.right` | `float` | &#9744; | right trim to be applied |
+| `settings.bar_length` | `float` | &#9745; | Bar Length to be used in optimization |
+| `parts[].length` | `float` | &#9745; | bar length to be cut |
+| `parts[].quantity` | `integer` | &#9745; | Times for this length to be used |
 
 
 Example Body:
@@ -135,47 +118,3 @@ Response:
     ]
 }
 ```
-
-## Authentication
-JWTAuthentication is used to generate tokens and refresh tokens
-## Run Locally
-
-*Navigate to the Root Directory of the Application*
-
-Install Requirements
-```python
-  pip install -r requirements.txt
-
-```
-
-Run Migrations
-```python
-  python3 manage.py makemigrations optimizations
-  python3 manage.py makemigrations users
-  python3 manage.py migrate optimizations
-  python3 manage.py migrate users
-  python3 manage.py makemigrations
-  python3 manage.py migrate
-```
-
-Run the project
-
-```python
-  python3 manage.py runserver
-```
-
-Create Super User
-```python
-  python3 manage.py createsuperuser
-```
-## Software Used
-
-**Client:** Postman
-
-**Server:** Python3
-
-
-## 🛠 Technical Knowledge
-- Python
-- Rest API
-- SQL
