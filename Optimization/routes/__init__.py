@@ -1,1 +1,0 @@
-# from .optimizations import urlpatterns
