@@ -1,14 +1,45 @@
 from django.http import JsonResponse
+from rest_framework.response import Response
 from rest_framework.decorators import api_view
-import json
+from rest_framework_simplejwt.tokens import AccessToken
 from itertools import combinations, count
+import jwt
+import json
+from django.shortcuts import get_object_or_404
+from .serializers import OptimizationsSerializer, OptimizationSerializer
+from .models import Optimization, OptimizationBar, OptimizationBarPart
+from django.contrib.auth.models import User
+from app.views import NotFound
 
-@api_view( [ 'post' ] )
-def register_user( request ):
-    return JsonResponse( { 'result': 'ok' } )
+@api_view( [ 'POST', 'GET' ] )
+def optimizations( request ):
+    if request.method == 'POST':
+        # handle POST request
+        return create( request )
+    elif request.method == 'GET':
+        # handle GET request
+        return get( request )
+    else:
+        return NotFound( request )
 
-@api_view( [ 'POST' ] )
 def create( request ):
+    #check for authorization if exists
+    # Get the token from the request headers
+    user_id = 0
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        # Extract the token from the Authorization header
+        token = auth_header.split(' ')[1]
+        try:
+            # Decode the token to get the payload
+            access_token = AccessToken(token)
+            user_id = access_token['user_id']
+            # Now you can use the user_id variable as needed in your code
+            print(f"The user ID is: {user_id}")
+        except Exception as e:
+            # Handle any errors that might occur
+            return JsonResponse( { 'result': 'error', 'message': 'invalid token' }, status=401 )
+    
     #load the request data from the body
     json_object = json.loads( request.body )
     #get the required values / parameters
@@ -115,5 +146,88 @@ def create( request ):
             'parts': sorted( bar, reverse=True ),
             'remnant': remnant
         }
-
+    if user_id > 0:
+        stored = store_optimization( bar_length, left_trim, right_trim, kerf, bars, user_id )
+        return JsonResponse( { 'result': 'ok', 'solution': bars, 'stored':stored } )
     return JsonResponse( { 'result': 'ok', 'solution': bars } )
+
+def get( request ):
+    #check for authorization if exists
+    # Get the token from the request headers
+    user_id = 0
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        # Extract the token from the Authorization header
+        token = auth_header.split(' ')[1]
+        try:
+            # Decode the token to get the payload
+            access_token = AccessToken(token)
+            user_id = access_token['user_id']
+            # Now you can use the user_id variable as needed in your code
+            print(f"The user ID is: {user_id}")
+        except Exception as e:
+            # Handle any errors that might occur
+            return JsonResponse( { 'result': 'error', 'message': 'invalid token' }, status=401 )
+    if( user_id > 0 ):
+        user = User.objects.get(id=user_id)
+        optimizations = Optimization.objects.filter( created_by=user ).all( )
+        serializer = OptimizationsSerializer(optimizations, many=True)
+        return JsonResponse( { 'result': 'ok', 'optimizations': serializer.data } )
+    else:
+        return JsonResponse( { 'result': 'error', 'message': 'unauthorized' }, status=401 )
+
+def store_optimization( bar_length, left_trim, right_trim, kerf, bars, user_id ):
+    try:
+        # Create an instance of Optimization
+        user = User.objects.get(id=user_id)
+
+        optimization = Optimization.objects.create(
+            kerf=kerf,
+            deduct_left=left_trim,
+            deduct_right=right_trim,
+            bar_length=bar_length,
+            created_by=user,  # assuming you are using Django's authentication framework
+        )
+
+        # Loop through the bars list and create an instance of OptimizationBar and OptimizationPart for each bar
+        for bar in bars:
+            optimization_bar = OptimizationBar.objects.create(
+                optimization=optimization,
+                remnant=bar[ 'remnant' ],
+            )
+
+            for length in bar["parts"]:
+
+                optimization_bar_part = OptimizationBarPart.objects.create(
+                    optimization_bar=optimization_bar,
+                    length=length,
+                )
+        return True
+    except Exception as e:
+        print( str( e ) )
+        return False
+    
+def get_single( request, id ):
+    user_id = 0
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        # Extract the token from the Authorization header
+        token = auth_header.split(' ')[1]
+        try:
+            # Decode the token to get the payload
+            access_token = AccessToken(token)
+            user_id = access_token['user_id']
+            # Now you can use the user_id variable as needed in your code
+            print(f"The user ID is: {user_id}")
+        except Exception as e:
+            # Handle any errors that might occur
+            return JsonResponse( { 'result': 'error', 'message': 'invalid token' }, status=401 )
+    user = User.objects.get(id=user_id)
+    optimization = Optimization.objects.filter(id=id, created_by=user).first()
+    serializer = OptimizationSerializer(optimization)
+    res = None
+    try:
+        res = JsonResponse( serializer.data )
+    except Exception as e:
+        res = JsonResponse( { 'error' } )
+    return res

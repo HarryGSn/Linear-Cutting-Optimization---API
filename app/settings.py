@@ -43,17 +43,19 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'users',
     'optimizations',
-    'corsheaders'
+    'corsheaders',
+    'app'
 ]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=3600),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'app.middleware.RateLimitMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -149,3 +151,9 @@ REST_FRAMEWORK = {
 }
 
 # AUTH_USER_MODEL = 'users.User'
+
+
+# For extra layer of DOS Protection:
+# settings.py
+RATE_LIMIT_REQUESTS = 300 # allow 100 requests per hour
+RATE_LIMIT_TIMEOUT = 3600 # set the time frame to 1 hour
